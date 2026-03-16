@@ -15,6 +15,41 @@ def get_series():
     with urllib.request.urlopen(url) as r:
         return json.loads(r.read().decode())
 
+def listar_generos():
+    db = get_series()
+    generos = {}
+    for nombre, data in db.items():
+        gs = data.get('generos', [])
+        genero = gs[0] if gs else 'Sin género'
+        if genero not in generos:
+            generos[genero] = []
+        generos[genero].append(nombre)
+
+    for genero in sorted(generos.keys()):
+        item = xbmcgui.ListItem(genero)
+        item.setInfo('video', {'title': genero, 'mediatype': 'tvshow'})
+        url = f"{sys.argv[0]}?action=series_por_genero&genero={urllib.parse.quote(genero)}"
+        xbmcplugin.addDirectoryItem(HANDLE, url, item, True)
+    xbmcplugin.setContent(HANDLE, 'tvshows')
+    xbmcplugin.endOfDirectory(HANDLE)
+
+def listar_series_por_genero(genero):
+    db = get_series()
+    for nombre, data in sorted(db.items()):
+        gs = data.get('generos', [])
+        genero_serie = gs[0] if gs else 'Sin género'
+        if genero_serie != genero:
+            continue
+        poster = data.get('poster', '')
+        art = {'poster': poster, 'thumb': poster, 'fanart': poster, 'icon': poster}
+        item = xbmcgui.ListItem(nombre)
+        item.setArt(art)
+        item.setInfo('video', {'title': nombre, 'mediatype': 'tvshow'})
+        url = f"{sys.argv[0]}?action=temporadas&serie={urllib.parse.quote(nombre)}"
+        xbmcplugin.addDirectoryItem(HANDLE, url, item, True)
+    xbmcplugin.setContent(HANDLE, 'tvshows')
+    xbmcplugin.endOfDirectory(HANDLE)
+
 def listar_series():
     db = get_series()
     for nombre, data in sorted(db.items()):
@@ -55,8 +90,12 @@ def listar_episodios(serie, temporada):
     for ep in episodios:
         titulo = ep['titulo']
         poster = ep.get('poster', data.get('poster', ''))
-        encoded = base64.b64encode(ep['url'].encode()).decode()
-        stream_url = f"{BASE_URL}/play/{encoded}"
+        url = ep['url']
+        if '.m3u8' in url:
+            stream_url = url
+        else:
+            encoded = base64.b64encode(url.encode()).decode()
+            stream_url = f"{BASE_URL}/play/{encoded}"
         art = {'poster': poster, 'thumb': poster, 'icon': poster}
         item = xbmcgui.ListItem(titulo)
         item.setArt(art)
@@ -81,7 +120,9 @@ params = dict(urllib.parse.parse_qsl(sys.argv[2].lstrip('?')))
 action = params.get('action', '')
 
 if action == '':
-    listar_series()
+    listar_generos()
+elif action == 'series_por_genero':
+    listar_series_por_genero(urllib.parse.unquote(params['genero']))
 elif action == 'temporadas':
     listar_temporadas(urllib.parse.unquote(params['serie']))
 elif action == 'episodios':
