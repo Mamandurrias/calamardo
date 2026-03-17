@@ -15,6 +15,22 @@ def get_series():
     with urllib.request.urlopen(url) as r:
         return json.loads(r.read().decode())
 
+def menu_principal():
+    db = get_series()
+    tiene_colecciones = any(data.get('coleccion') for data in db.values())
+
+    item = xbmcgui.ListItem("🎭 Géneros")
+    item.setInfo('video', {'title': 'Géneros', 'mediatype': 'tvshow'})
+    xbmcplugin.addDirectoryItem(HANDLE, f"{sys.argv[0]}?action=generos", item, True)
+
+    if tiene_colecciones:
+        item = xbmcgui.ListItem("📦 Colecciones")
+        item.setInfo('video', {'title': 'Colecciones', 'mediatype': 'tvshow'})
+        xbmcplugin.addDirectoryItem(HANDLE, f"{sys.argv[0]}?action=colecciones", item, True)
+
+    xbmcplugin.setContent(HANDLE, 'tvshows')
+    xbmcplugin.endOfDirectory(HANDLE)
+
 def listar_generos():
     db = get_series()
     generos = {}
@@ -24,7 +40,6 @@ def listar_generos():
         if genero not in generos:
             generos[genero] = []
         generos[genero].append(nombre)
-
     for genero in sorted(generos.keys()):
         item = xbmcgui.ListItem(genero)
         item.setInfo('video', {'title': genero, 'mediatype': 'tvshow'})
@@ -33,9 +48,29 @@ def listar_generos():
     xbmcplugin.setContent(HANDLE, 'tvshows')
     xbmcplugin.endOfDirectory(HANDLE)
 
+def listar_colecciones():
+    db = get_series()
+    colecciones = {}
+    for nombre, data in db.items():
+        col = data.get('coleccion')
+        if col:
+            if col not in colecciones:
+                colecciones[col] = []
+            colecciones[col].append(nombre)
+    for col in sorted(colecciones.keys()):
+        item = xbmcgui.ListItem(col)
+        item.setInfo('video', {'title': col, 'mediatype': 'tvshow'})
+        url = f"{sys.argv[0]}?action=series_por_coleccion&coleccion={urllib.parse.quote(col)}"
+        xbmcplugin.addDirectoryItem(HANDLE, url, item, True)
+    xbmcplugin.setContent(HANDLE, 'tvshows')
+    xbmcplugin.endOfDirectory(HANDLE)
+
 def listar_series_por_genero(genero):
     db = get_series()
     for nombre, data in sorted(db.items()):
+        # Si tiene coleccion, no aparece en generos
+        if data.get('coleccion'):
+            continue
         gs = data.get('generos', [])
         genero_serie = gs[0] if gs else 'Sin género'
         if genero_serie != genero:
@@ -50,9 +85,11 @@ def listar_series_por_genero(genero):
     xbmcplugin.setContent(HANDLE, 'tvshows')
     xbmcplugin.endOfDirectory(HANDLE)
 
-def listar_series():
+def listar_series_por_coleccion(coleccion):
     db = get_series()
     for nombre, data in sorted(db.items()):
+        if data.get('coleccion') != coleccion:
+            continue
         poster = data.get('poster', '')
         art = {'poster': poster, 'thumb': poster, 'fanart': poster, 'icon': poster}
         item = xbmcgui.ListItem(nombre)
@@ -120,9 +157,15 @@ params = dict(urllib.parse.parse_qsl(sys.argv[2].lstrip('?')))
 action = params.get('action', '')
 
 if action == '':
+    menu_principal()
+elif action == 'generos':
     listar_generos()
+elif action == 'colecciones':
+    listar_colecciones()
 elif action == 'series_por_genero':
     listar_series_por_genero(urllib.parse.unquote(params['genero']))
+elif action == 'series_por_coleccion':
+    listar_series_por_coleccion(urllib.parse.unquote(params['coleccion']))
 elif action == 'temporadas':
     listar_temporadas(urllib.parse.unquote(params['serie']))
 elif action == 'episodios':
