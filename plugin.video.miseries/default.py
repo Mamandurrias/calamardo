@@ -17,17 +17,12 @@ def get_series():
 
 def menu_principal():
     db = get_series()
-    tiene_colecciones = any(data.get('coleccion') for data in db.values())
-
     item = xbmcgui.ListItem("🎭 Géneros")
     item.setInfo('video', {'title': 'Géneros', 'mediatype': 'tvshow'})
     xbmcplugin.addDirectoryItem(HANDLE, f"{sys.argv[0]}?action=generos", item, True)
-
-    if tiene_colecciones:
-        item = xbmcgui.ListItem("📦 Colecciones")
-        item.setInfo('video', {'title': 'Colecciones', 'mediatype': 'tvshow'})
-        xbmcplugin.addDirectoryItem(HANDLE, f"{sys.argv[0]}?action=colecciones", item, True)
-
+    item = xbmcgui.ListItem("📦 Colecciones")
+    item.setInfo('video', {'title': 'Colecciones', 'mediatype': 'tvshow'})
+    xbmcplugin.addDirectoryItem(HANDLE, f"{sys.argv[0]}?action=colecciones", item, True)
     xbmcplugin.setContent(HANDLE, 'tvshows')
     xbmcplugin.endOfDirectory(HANDLE)
 
@@ -68,18 +63,22 @@ def listar_colecciones():
 def listar_series_por_genero(genero):
     db = get_series()
     for nombre, data in sorted(db.items()):
-        # Si tiene coleccion, no aparece en generos
-        if data.get('coleccion'):
-            continue
         gs = data.get('generos', [])
         genero_serie = gs[0] if gs else 'Sin género'
         if genero_serie != genero:
             continue
         poster = data.get('poster', '')
+        sinopsis = data.get('sinopsis', '')
+        anio = data.get('anio', '')
         art = {'poster': poster, 'thumb': poster, 'fanart': poster, 'icon': poster}
         item = xbmcgui.ListItem(nombre)
         item.setArt(art)
-        item.setInfo('video', {'title': nombre, 'mediatype': 'tvshow'})
+        item.setInfo('video', {
+            'title': nombre,
+            'mediatype': 'tvshow',
+            'plot': sinopsis,
+            'year': int(anio) if anio and anio.isdigit() else 0,
+        })
         url = f"{sys.argv[0]}?action=temporadas&serie={urllib.parse.quote(nombre)}"
         xbmcplugin.addDirectoryItem(HANDLE, url, item, True)
     xbmcplugin.setContent(HANDLE, 'tvshows')
@@ -91,10 +90,17 @@ def listar_series_por_coleccion(coleccion):
         if data.get('coleccion') != coleccion:
             continue
         poster = data.get('poster', '')
+        sinopsis = data.get('sinopsis', '')
+        anio = data.get('anio', '')
         art = {'poster': poster, 'thumb': poster, 'fanart': poster, 'icon': poster}
         item = xbmcgui.ListItem(nombre)
         item.setArt(art)
-        item.setInfo('video', {'title': nombre, 'mediatype': 'tvshow'})
+        item.setInfo('video', {
+            'title': nombre,
+            'mediatype': 'tvshow',
+            'plot': sinopsis,
+            'year': int(anio) if anio and anio.isdigit() else 0,
+        })
         url = f"{sys.argv[0]}?action=temporadas&serie={urllib.parse.quote(nombre)}"
         xbmcplugin.addDirectoryItem(HANDLE, url, item, True)
     xbmcplugin.setContent(HANDLE, 'tvshows')
@@ -105,12 +111,20 @@ def listar_temporadas(serie):
     data = db[serie]
     temporadas = sorted(set(ep['temporada'] for ep in data['episodios']))
     poster = data.get('poster', '')
+    sinopsis = data.get('sinopsis', '')
+    anio = data.get('anio', '')
     for t in temporadas:
         nombre = f"Temporada {int(t)}"
         art = {'poster': poster, 'thumb': poster, 'icon': poster}
         item = xbmcgui.ListItem(nombre)
         item.setArt(art)
-        item.setInfo('video', {'title': nombre, 'mediatype': 'season', 'season': int(t)})
+        item.setInfo('video', {
+            'title': nombre,
+            'mediatype': 'season',
+            'season': int(t),
+            'plot': sinopsis,
+            'year': int(anio) if anio and anio.isdigit() else 0,
+        })
         url = f"{sys.argv[0]}?action=episodios&serie={urllib.parse.quote(serie)}&temporada={t}"
         xbmcplugin.addDirectoryItem(HANDLE, url, item, True)
     xbmcplugin.setContent(HANDLE, 'seasons')
@@ -125,7 +139,7 @@ def listar_episodios(serie, temporada):
     )
     import base64
     for ep in episodios:
-        titulo = ep['titulo']
+        titulo = f"S{ep['temporada']}E{ep['episodio']} - {ep['titulo']}"
         poster = ep.get('poster', data.get('poster', ''))
         url = ep['url']
         if '.m3u8' in url:
