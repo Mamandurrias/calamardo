@@ -30,6 +30,8 @@ def listar_generos():
     db = get_series()
     generos = {}
     for nombre, data in db.items():
+        if data.get('coleccion'):
+            continue
         gs = data.get('generos', [])
         genero = gs[0] if gs else 'Sin género'
         if genero not in generos:
@@ -63,6 +65,8 @@ def listar_colecciones():
 def listar_series_por_genero(genero):
     db = get_series()
     for nombre, data in sorted(db.items()):
+        if data.get('coleccion'):
+            continue
         gs = data.get('generos', [])
         genero_serie = gs[0] if gs else 'Sin género'
         if genero_serie != genero:
