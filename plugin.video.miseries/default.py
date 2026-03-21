@@ -77,9 +77,10 @@ def listar_series_por_genero(genero):
             continue
         poster = data.get('poster', '')
         art = {'poster': poster, 'thumb': poster, 'fanart': poster, 'icon': poster}
-        item = xbmcgui.ListItem(nombre)
+        nombre_mostrar = f"{nombre} ({anio})" if anio and anio.isdigit() else nombre
+        item = xbmcgui.ListItem(nombre_mostrar)
         item.setArt(art)
-        item.setInfo('video', {'title': nombre, 'mediatype': 'tvshow'})
+        item.setInfo('video', {'title': nombre_mostrar, 'mediatype': 'tvshow', 'plot': sinopsis, 'year': int(anio) if anio and anio.isdigit() else 0})
         url = f"{sys.argv[0]}?action=temporadas&serie={urllib.parse.quote(nombre)}"
         xbmcplugin.addDirectoryItem(HANDLE, url, item, True)
     xbmcplugin.setContent(HANDLE, 'tvshows')
@@ -92,9 +93,10 @@ def listar_series_por_coleccion(coleccion):
             continue
         poster = data.get('poster', '')
         art = {'poster': poster, 'thumb': poster, 'fanart': poster, 'icon': poster}
-        item = xbmcgui.ListItem(nombre)
+        nombre_mostrar = f"{nombre} ({anio})" if anio and anio.isdigit() else nombre
+        item = xbmcgui.ListItem(nombre_mostrar)
         item.setArt(art)
-        item.setInfo('video', {'title': nombre, 'mediatype': 'tvshow'})
+        item.setInfo('video', {'title': nombre_mostrar, 'mediatype': 'tvshow', 'plot': sinopsis, 'year': int(anio) if anio and anio.isdigit() else 0})
         url = f"{sys.argv[0]}?action=temporadas&serie={urllib.parse.quote(nombre)}"
         xbmcplugin.addDirectoryItem(HANDLE, url, item, True)
     xbmcplugin.setContent(HANDLE, 'tvshows')
