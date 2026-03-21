@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addons>
 <addon id="plugin.video.miseries" name="Mis Series" version="1.0.2" provider-name="VPS">
   <requires>
@@ -16,5 +16,4 @@
     </assets>
   </extension>
 </addon>
-
 </addons>

@@ -75,11 +75,10 @@ def listar_series_por_genero(genero):
         sinopsis = data.get('sinopsis', '')
         anio = data.get('anio', '')
         art = {'poster': poster, 'thumb': poster, 'fanart': poster, 'icon': poster}
-        nombre_mostrar = f"{nombre} ({anio})" if anio and anio.isdigit() else nombre
-        item = xbmcgui.ListItem(nombre_mostrar)
+        item = xbmcgui.ListItem(nombre)
         item.setArt(art)
         item.setInfo('video', {
-            'title': nombre_mostrar,
+            'title': nombre,
             'mediatype': 'tvshow',
             'plot': sinopsis,
             'year': int(anio) if anio and anio.isdigit() else 0,
@@ -98,11 +97,10 @@ def listar_series_por_coleccion(coleccion):
         sinopsis = data.get('sinopsis', '')
         anio = data.get('anio', '')
         art = {'poster': poster, 'thumb': poster, 'fanart': poster, 'icon': poster}
-        nombre_mostrar = f"{nombre} ({anio})" if anio and anio.isdigit() else nombre
-        item = xbmcgui.ListItem(nombre_mostrar)
+        item = xbmcgui.ListItem(nombre)
         item.setArt(art)
         item.setInfo('video', {
-            'title': nombre_mostrar,
+            'title': nombre,
             'mediatype': 'tvshow',
             'plot': sinopsis,
             'year': int(anio) if anio and anio.isdigit() else 0,
