@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addons>
-<?xml version="1.0" encoding="UTF-8"?>
 <addon id="plugin.video.miseries" name="Mis Series" version="1.0.3" provider-name="VPS">
   <requires>
     <import addon="xbmc.python" version="3.0.0"/>
