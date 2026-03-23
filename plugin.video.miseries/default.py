@@ -19,7 +19,6 @@ def menu_principal():
     db = get_series()
     tiene_colecciones = any(data.get('coleccion') for data in db.values())
 
-    # Opción Géneros con icono
     item = xbmcgui.ListItem("Géneros")
     item.setArt({'icon': 'DefaultGenre.png', 'thumb': 'DefaultGenre.png'})
     item.setInfo('video', {'title': 'Géneros', 'mediatype': 'tvshow'})
@@ -73,7 +72,6 @@ def listar_colecciones():
 def listar_series_por_genero(genero):
     db = get_series()
     for nombre, data in sorted(db.items()):
-        # Si tiene coleccion, no aparece en generos
         if data.get('coleccion'):
             continue
         gs = data.get('generos', [])
@@ -130,7 +128,7 @@ def listar_episodios(serie, temp):
     for ep in episodios:
         num = ep.get('episodio', '')
         titulo = ep.get('titulo', '')
-        strm_url = ep.get('strm', '')
+        strm_url = ep.get('url', '')  # CAMBIADO: antes era 'strm', ahora es 'url'
         if not strm_url:
             continue
         nombre = f"{num} - {titulo}" if titulo else f"Episodio {num}"
