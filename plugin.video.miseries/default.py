@@ -112,7 +112,8 @@ def listar_series_por_coleccion(coleccion):
 def listar_temporadas(serie):
     db = get_series()
     data = db.get(serie, {})
-    temps = sorted(data.get('temporadas', []), key=lambda x: int(x))
+    episodios = data.get('episodios', [])
+    temps = sorted(set([ep.get('temporada', '') for ep in episodios if ep.get('temporada')]))
     for temp in temps:
         item = xbmcgui.ListItem(f"Temporada {temp}")
         item.setInfo('video', {'title': f"Temporada {temp}", 'mediatype': 'season'})
@@ -124,11 +125,13 @@ def listar_temporadas(serie):
 def listar_episodios(serie, temp):
     db = get_series()
     data = db.get(serie, {})
-    episodios = data.get('episodios', {}).get(temp, [])
+    episodios = data.get('episodios', [])
     for ep in episodios:
+        if ep.get('temporada') != temp:
+            continue
         num = ep.get('episodio', '')
         titulo = ep.get('titulo', '')
-        strm_url = ep.get('url', '')  # CAMBIADO: antes era 'strm', ahora es 'url'
+        strm_url = ep.get('url', '')
         if not strm_url:
             continue
         nombre = f"{num} - {titulo}" if titulo else f"Episodio {num}"
