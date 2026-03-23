@@ -16,7 +16,7 @@
     </assets>
   </extension>
 </addon>
-<addon id="repository.calamardo" name="Calamardo Repository" version="1.0.0" provider-name="VPS">
+<addon id="repository.calamardo" name="Calamardo Repository" version="1.0.1" provider-name="VPS">
   <requires>
     <import addon="xbmc.addon" version="18.0.0"/>
   </requires>
