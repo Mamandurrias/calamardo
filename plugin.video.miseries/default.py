@@ -76,6 +76,8 @@ def listar_series_por_genero(genero):
         if genero_serie != genero:
             continue
         poster = data.get('poster', '')
+        sinopsis = data.get('sinopsis', '')
+        anio = data.get('anio', '')
         art = {'poster': poster, 'thumb': poster, 'fanart': poster, 'icon': poster}
         nombre_mostrar = f"{nombre} ({anio})" if anio and anio.isdigit() else nombre
         item = xbmcgui.ListItem(nombre_mostrar)
@@ -92,6 +94,8 @@ def listar_series_por_coleccion(coleccion):
         if data.get('coleccion') != coleccion:
             continue
         poster = data.get('poster', '')
+        sinopsis = data.get('sinopsis', '')
+        anio = data.get('anio', '')
         art = {'poster': poster, 'thumb': poster, 'fanart': poster, 'icon': poster}
         nombre_mostrar = f"{nombre} ({anio})" if anio and anio.isdigit() else nombre
         item = xbmcgui.ListItem(nombre_mostrar)
