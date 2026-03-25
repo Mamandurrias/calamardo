@@ -125,32 +125,32 @@ def listar_temporadas(serie):
 def listar_episodios(serie, temp):
     db = get_series()
     data = db.get(serie, {})
-    episodios = data.get("episodios", [])
+    episodios = data.get('episodios', [])
     for ep in episodios:
-        if ep.get("temporada") != temp:
+        if ep.get('temporada') != temp:
             continue
-        num = ep.get("episodio", "")
-        titulo = ep.get("titulo", "")
-        sinopsis = ep.get("sinopsis", "")
-        duracion = ep.get("duracion", 0)
-        strm_url = ep.get("url", "")
+        num = ep.get('episodio', '')
+        titulo = ep.get('titulo', '')
+        sinopsis = ep.get('sinopsis', '')
+        duracion = ep.get('duracion', 0)
+        strm_url = ep.get('url', '')
         if not strm_url:
             continue
         nombre = f"{num} - {titulo}" if titulo else f"Episodio {num}"
         item = xbmcgui.ListItem(nombre)
         info = {
-            "title": nombre,
-            "mediatype": "episode",
-            "season": int(temp),
-            "episode": int(num) if num.isdigit() else 0,
-            "plot": sinopsis,
-            "duration": duracion
+            'title': nombre,
+            'mediatype': 'episode',
+            'season': int(temp),
+            'episode': int(num) if num.isdigit() else 0,
+            'plot': sinopsis,
+            'duration': duracion
         }
-        item.setInfo("video", info)
-        if ep.get("poster"):
-            item.setArt({"poster": ep["poster"], "thumb": ep["poster"]})
+        item.setInfo('video', info)
+        if ep.get('poster'):
+            item.setArt({'poster': ep['poster'], 'thumb': ep['poster']})
         xbmcplugin.addDirectoryItem(HANDLE, strm_url, item, False)
-    xbmcplugin.setContent(HANDLE, "episodes")
+    xbmcplugin.setContent(HANDLE, 'episodes')
     xbmcplugin.endOfDirectory(HANDLE)
 
 def main():
