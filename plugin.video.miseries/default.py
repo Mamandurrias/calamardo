@@ -131,12 +131,22 @@ def listar_episodios(serie, temp):
             continue
         num = ep.get('episodio', '')
         titulo = ep.get('titulo', '')
+        sinopsis = ep.get('sinopsis', '')
         strm_url = ep.get('url', '')
         if not strm_url:
             continue
         nombre = f"{num} - {titulo}" if titulo else f"Episodio {num}"
         item = xbmcgui.ListItem(nombre)
-        item.setInfo('video', {'title': nombre, 'mediatype': 'episode', 'season': int(temp), 'episode': int(num) if num.isdigit() else 0})
+        info = {
+            'title': nombre,
+            'mediatype': 'episode',
+            'season': int(temp),
+            'episode': int(num) if num.isdigit() else 0,
+            'plot': sinopsis
+        }
+        item.setInfo('video', info)
+        if ep.get('poster'):
+            item.setArt({'poster': ep['poster'], 'thumb': ep['poster']})
         xbmcplugin.addDirectoryItem(HANDLE, strm_url, item, False)
     xbmcplugin.setContent(HANDLE, 'episodes')
     xbmcplugin.endOfDirectory(HANDLE)
